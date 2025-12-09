@@ -20,6 +20,8 @@ let precioCarrito = document.getElementById("total-price");
 let contadorCarrito = document.getElementById("cart-count");
 
 let boton_imprimir = document.getElementById("btn-imprimir");
+let boton_imprimir_wps = document.getElementById("btn-imprimir-wps");
+
 
 let carrito = [];
 
@@ -27,7 +29,7 @@ let carrito = [];
 
 
 // Obtener productos////////////////////////////////////////////
-const url = "api/products"; // Guardamos en una variable la url de nuestro endpoint
+const url = "http://localhost:3000/api/products"; // Guardamos en una variable la url de nuestro endpoint
 
 async function obtenerProductos() {
     try {
@@ -145,7 +147,7 @@ function filtrarProductos() {
 
 //Mandar orden de compra a Whatsapp
 
-boton_imprimir.addEventListener("click", () => {
+boton_imprimir_wps.addEventListener("click", () => {
   
   const productosTexto = carrito
     .map(p => `${p.nombre} ($${p.precio})`)
