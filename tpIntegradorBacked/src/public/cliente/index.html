@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Autoservicio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    
+
+  
+    
+</head>
+<body class="pagina-bienvenida">
+    <header class="header-bienvenida">
+        
+        <h2>Autoservicio</h2>
+    </header>
+
+    <main class="main-bienvenida">
+    
+        <h1>Bienvenidos!</h1>
+
+        <h4>Introducí tu nombre</h4>
+        <form id="form-bienvenida">
+            <input type="text" id="bienvenida-nombre">
+            <input class="btn-enviar" type="submit" value="Enviar">
+        </form>
+
+    </main>
+
+    <script>
+        // Formulario bienvenida
+        let formBienvenida = document.getElementById("form-bienvenida");
+        formBienvenida.addEventListener("submit", event => {
+            event.preventDefault();
+
+            let nombreUsuario = document.getElementById("bienvenida-nombre").value;
+
+            if(nombreUsuario.length > 0) {
+                sessionStorage.setItem("nombreUsuario", nombreUsuario); // Guardamos el nombre de usuario
+                window.location.href = "productos.html"; // Hacemos la redireccion
+            }
+        });
+    </script>
+</body>
+</html>
