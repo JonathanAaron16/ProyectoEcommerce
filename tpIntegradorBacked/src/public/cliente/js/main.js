@@ -108,20 +108,26 @@ function mostrarCarrito() {
     // Mostrar el numero de objetos en el array carrito
     contadorCarrito.innerHTML = carrito.length;
     
+   // Ocultar carrito si no hay productos
+   if(carrito.length > 0) {
+    document.getElementById("empty-cart").classList.remove("hidden");
+    document.getElementById("empty-cart").classList.add("visible");
+    
+    document.getElementById("btn-imprimir").classList.remove("hidden");
+    document.getElementById("btn-imprimir").classList.add("visible");
 
-    // Ocultar carrito si no hay productos
-    if(carrito.length > 0) {
-        document.getElementById("empty-cart").classList.remove("hidden");
-        document.getElementById("empty-cart").classList.add("visible");
-        
-        document.getElementById("btn-imprimir").classList.remove("hidden");
-        document.getElementById("btn-imprimir").classList.add("visible");
-    } else {
-        document.getElementById("empty-cart").classList.remove("visible");
-        document.getElementById("empty-cart").classList.add("hidden");
-        document.getElementById("btn-imprimir").classList.remove("visible");
-        document.getElementById("btn-imprimir").classList.add("hidden");
-        
+    document.getElementById("btn-imprimir-wps").classList.remove("hidden");
+    document.getElementById("btn-imprimir-wps").classList.add("visible");
+
+} else {
+    document.getElementById("empty-cart").classList.remove("visible");
+    document.getElementById("empty-cart").classList.add("hidden");
+    
+    document.getElementById("btn-imprimir").classList.remove("visible");
+    document.getElementById("btn-imprimir").classList.add("hidden");
+
+    document.getElementById("btn-imprimir-wps").classList.remove("visible");
+    document.getElementById("btn-imprimir-wps").classList.add("hidden");
 
         objetosCarrito.innerHTML = `<p class="info-carrito">No hay productos en el carrito.</p>`;
     }
