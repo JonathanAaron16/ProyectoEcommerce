@@ -1,9 +1,10 @@
 import { Router } from "express";
+import { productsView } from "../controllers/view.controllers.js";
 import { requireLogin } from "../middlewares/middlewares.js";
 const router = Router();
 
 
-router.get("/", requireLogin);
+router.get("/", requireLogin, productsView);
 
 router.get("/consultar", requireLogin, (req, res) => {
 
@@ -42,7 +43,8 @@ router.get("/eliminar", requireLogin, (req, res) => {
 // Vista Login
 router.get("/login", (req, res) => {
     res.render("login", {
-        title: "Login"
+        title: "Login",
+        about: "Login dashboard"
     });
 });
 // Exportamos las rutas de las vistas

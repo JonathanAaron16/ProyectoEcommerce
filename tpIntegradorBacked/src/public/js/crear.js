@@ -1,7 +1,41 @@
-let altaProducts_form = document.getElementById("altaProducts-form");
-let url = "http://localhost:3000/api/products";
+let altaProducts_container = document.getElementById("altaProducts-container");
+let altaUsers_container = document.getElementById("altaUsers-container");
+let url = "http://localhost:3000";
 
-altaProducts_form.addEventListener("submit", event => {
+altaUsers_container.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    let formData = new FormData(event.target); // Transformamos en objeto FormData los campos del formulario
+
+    let data = Object.fromEntries(formData.entries()); // Transformaos a objeto JS el objeto FormData
+
+    console.log(data);
+
+    // Vamos a enviar los datos de nuestro usuario al endpoint /api/users
+    try {
+        let response = await fetch(`${url}/api/users`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        });
+
+        if(response.ok) {
+            console.log(response);
+
+            let result = await response.json();
+            console.log(result);
+            alert(result.message)
+        }
+
+    } catch(error) { // El catch solo captura errores de red
+        console.error("Error al enviar los datos: ", error);
+        alert("Error al procesar la solicitud");
+    }
+});
+
+altaProducts_container.addEventListener("submit", event => {
 
     event.preventDefault(); // Evitamos el envio por defecto del formulario
 
@@ -27,8 +61,8 @@ async function enviarProducto(data) {
     console.table(data); // Recibimos correctamente los datos del formulario
 
     try {
-        // let url = "http://localhost:3000/api/products"
-        let response = await fetch(url, {
+        //let url = "http://localhost:3000/api/products"
+        let response = await fetch(`${url}/api/products`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

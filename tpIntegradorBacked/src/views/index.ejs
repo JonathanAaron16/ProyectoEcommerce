@@ -7,7 +7,7 @@
     <div id="contenedor-productos">
 
         <!-- Vamos a iterar el array de productos que le pasamos desde el endpoint -->
-        <% products.forEach(prod => { %>
+        <% productos.forEach(prod => { %>
             <div class="card-producto">
                 <img src="<%= prod.img_url %>" alt="<%= prod.nombre %>">
                 <h5><%= prod.nombre %></h5>

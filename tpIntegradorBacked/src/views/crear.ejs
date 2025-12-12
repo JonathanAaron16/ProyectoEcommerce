@@ -1,13 +1,18 @@
+
+
+
 <%- include("partials/head.ejs") %>
 <%- include("partials/nav.ejs") %>
 
-<main>
-    <h1> <%= about %> </h1>
+<main id="alta-container">
+    
+    <div id="products-container" class="form-container">
+        <h3>Alta productos</h3>
 
-    <!-- A menos que enviemos este formulario con el envio nativo del formulario HTML, no necesitamos poner ni action ni method -->
-    <form id="altaProducts-form" class="products-form-amplio">
-
-        <label for="nameProd">Nombre</label>
+        <!-- Formulario para crear productos y enviarlos a /api/products -->
+        <form id="altaProducts-container" class="form-alta">
+    
+           <label for="nameProd">Nombre</label>
         <input type="text" name="nombre" id="nameProd" required>
         <br>
 
@@ -27,12 +32,27 @@
         <br>
 
         <input type="submit" value="Crear producto">
-    </form>
-   
+        </form>
+    </div>
 
+    <div id="users-container" class="form-container">
+        <h3>Alta usuarios</h3>
 
-    <hr>
-    <div id="contenedor-productos"></div>
+        <!-- Formulario para crear usuarios y enviarlos a /api/users -->
+        <form id="altaUsers-container" class="form-alta">
+            <label for="nombreUser">Nombre</label>
+            <input type="text" name="nombre" id="nombreUser" required>
+    
+            <label for="emailUser">Email</label>
+            <input type="email" name="correo" id="emailUser" required>
+    
+            <label for="passwordUser">Password</label>
+            <input type="password" name="password" id="passwordUser" required>
+    
+            <input type="submit" value="Crear usuario">
+        </form>
+    </div>
+
 </main>
 
 <script src="js/crear.js"></script>

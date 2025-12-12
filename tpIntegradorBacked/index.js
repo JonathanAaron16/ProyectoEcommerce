@@ -10,10 +10,10 @@ const PORT = environments.port;
 import cors from "cors"; // Importamos cors para poder usar sus metodos y permitir solicitudes de otras aplicaciones
 
 // Importamos los middlewares
-import { loggerUrl , requireLogin} from "./src/api/middlewares/middlewares.js";
+import { loggerUrl } from "./src/api/middlewares/middlewares.js";
 
 // Importamos las rutas de producto
-import { productRoutes , viewRoutes } from "./src/api/routes/index.js";
+import { productRoutes , viewRoutes, userRoutes } from "./src/api/routes/index.js";
 
 // Importamos la configuracion para trabajar con rutas y archivos estaticos
 import { join, __dirname } from "./src/api/utils/index.js";
@@ -23,24 +23,13 @@ import connection from "./src/api/database/db.js";
 import session from "express-session";
 const SESSION_KEY = environments.session_key;
 
-
+import bcrypt from "bcrypt";
 
 /*===================
     Middlewares
 ===================*/
 app.use(cors()); // Middleware basico que permite todas las solicitudes
-/* Que es CORS?
-CORS, o Intercambio de Recursos de Origen Cruzado, es un mecanismo de seguridad implementado por los navegadores web que permite a una página web 
-solicitar recursos desde un dominio diferente al del origen actual  Este mecanismo se activa cuando una solicitud HTTP se realiza a un recurso 
-en un dominio distinto al de la página que la originó, y su propósito principal es proteger a los usuarios de ataques 
-como el secuestro de sesión o el acceso no autorizado a datos sensibles  CORS funciona mediante la verificación de encabezados HTTP específicos, 
-como `Access-Control-Allow-Origin`, que el servidor debe incluir en su respuesta para indicar si está autorizado el acceso desde un origen determinado  
-Sin este permiso explícito, el navegador bloquea la solicitud para mantener la seguridad de la política del mismo origen*/
 
-/* Middleware para parsear la informacion de JSON a objetos JS en las peticiones POST
-
-El cuerpo de la solicitud, disponible en `req.body`, se utiliza comúnmente para recibir datos enviados en peticiones POST o PUT, aunque requiere middleware como `express.json()` para ser procesado correctamente
-*/
 
 // Middleware logger
 app.use(loggerUrl);
@@ -73,7 +62,10 @@ app.set("views", join(__dirname, "src", "views")); // Le indicamos la ruta donde
 // Ahora las rutas las gestiona el middleware Router
 app.use("/api/products", productRoutes);
 
+app.use("/", viewRoutes);
 
+// Rutas usuario
+app.use("/api/users", userRoutes);
 /*===================
     Endpoints
 ===================*/
@@ -81,64 +73,6 @@ app.use("/api/products", productRoutes);
 
 
 // Devolveremos vistas
-app.get("/", requireLogin, async (req, res) => {
-    /* Logica pasada al middleware requireLogin
-    if(!req.session.user) {
-        return res.redirect("/login");
-    }
-    */
-
-    try {
-        const [rows] = await connection.query("SELECT * FROM productos");
-        
-        // Le devolvemos la pagina index.ejs
-        res.render("index", {
-            title: "Indice",
-            about: "Lista de productos",
-            products: rows
-        }); 
-
-    } catch (error) {
-        console.log(error);
-    }
-});
-
-app.get("/consultar", requireLogin,(req, res) => {
-    res.render("consultar", {
-        title: "Consultar",
-        about: "Consultar producto por id:"
-    });
-});
-
-app.get("/crear", requireLogin,(req, res) => {
-    res.render("crear", {
-        title: "Crear",
-        about: "Crear producto"
-    });
-});
-
-app.get("/modificar",requireLogin, (req, res) => {
-    res.render("modificar", {
-        title: "Modificar",
-        about: "Actualizar producto"
-    });
-})
-
-
-app.get("/eliminar", requireLogin,(req, res) => {
-    res.render("eliminar", {
-        title: "Eliminar",
-        about: "Eliminar producto"
-    });
-})
-
-// Vista de login
-app.get("/login", (req, res) => {
-    res.render("login", {
-        title: "Login",
-        about: "Login dashboard"
-    });
-});
 
 app.post("/login", async (req, res) => {
     try {
@@ -153,8 +87,12 @@ app.post("/login", async (req, res) => {
             });
         }
 
-        const sql = "SELECT * FROM usuarios WHERE correo = ? AND password = ? ";
-        const [rows] = await connection.query(sql, [email, password]);
+       // const sql = "SELECT * FROM usuarios WHERE correo = ? AND password = ? ";
+       // const [rows] = await connection.query(sql, [email, password]);
+
+
+        const sql = "SELECT * FROM usuarios where correo = ?";
+        const [rows] = await connection.query(sql, [email]);
 
         // Validacion 2: Verificamos si existe este email y password
         if(rows.length === 0) {
@@ -165,25 +103,46 @@ app.post("/login", async (req, res) => {
             })
         }
 
-        // console.log(rows);
+        console.log(rows);
         const user = rows[0];
         console.table(user);
 
-        req.session.user = {
+       
+        // Bcrypt II -> Comparamos el password hasheado (la contraseña del login hasheada es igual a la de la BBDD?)
+        const match = await bcrypt.compare(password, user.password); // Si ambos hashes coinciden, es porque coinciden las contraseñas y match devuelve true
+
+        console.log("Resultado de compare:", match);
+        
+        
+
+        if(match) {            
+            // Guardamos la sesion
+            req.session.user = {
                 id: user.id,
-                name: user.name,
-                email: user.mail
+                name: user.nombre,
+                email: user.correo
             }
+    
+            // Una vez guardada la sesion, vamos a redireccionar al dashboard
+            res.redirect("/");
 
+        } else {
+            return res.render("login", {
+                title: "Login",
+                 about: "Login dashboard",
+                error: "Epa! Contraseña incorrecta"
+            });
+        }
 
-        res.redirect("/"); // Redirigimos a la pagina principal
-      
 
     } catch (error) {
-        console.error("Error en el login", error);
+        console.log("Error en el login: ", error);
+
+        res.status(500).json({
+            error: "Error interno del servidor"
+        });
     }
 });
-
 
 // Creamos el endpoint para destruir la sesion y redireccionar
 app.post("/logout", (req, res) => {
